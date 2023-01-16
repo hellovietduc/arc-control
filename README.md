@@ -14,3 +14,5 @@ Download the latest workflow from the [releases](https://github.com/hellovietduc
 
 
 ## License
+
+MIT © [Duc Nguyen](./LICENSE)
