@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.hellovietduc.alfred.arc-control</string>
+	<key>connections</key>
+	<dict>
+		<key>B7D01C90-FCC3-4D23-A2E3-342837DE2C3A</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3685A677-8073-4A84-BE71-AEBD76F8325E</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>F651F0B7-25C4-4A3C-8CE4-B1D2B820C904</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B7D01C90-FCC3-4D23-A2E3-342837DE2C3A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>Duc Nguyen</string>
+	<key>description</key>
+	<string>An Alfred Workflow for controlling Arc browser</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Arc Control</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<true/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>2</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>keyword</key>
+				<string>t</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Loading tabs...</string>
+				<key>script</key>
+				<string>on escape_string(_text)
+  set AppleScript's text item delimiters to the "\""
+  set the item_list to every text item of _text
+  set AppleScript's text item delimiters to the "\\\""
+  set _text to the item_list as string
+  set AppleScript's text item delimiters to ""
+  return _text
+end
+
+on build_item(_space_title, _tab_title, _tab_url, _arg)
+  set _item_title to "\"title\":\"" &amp; _tab_title &amp; "\","
+  set _item_subtitle to "\"subtitle\":\"" &amp; _space_title &amp; " • " &amp; _tab_url &amp; "\","
+  set _item_arg to "\"arg\":" &amp; _arg &amp; ","
+  set _item_match to "\"match\":\"" &amp; _tab_title &amp; " " &amp; _tab_url &amp; "\","
+  set _item_mods to "\"mods\":{\"cmd\":{\"valid\":true,\"arg\":\"" &amp; _tab_url &amp; "\",\"subtitle\":\"Press ?+C to copy URL\"}},"
+  set _item_text to "\"text\":{\"copy\":\"" &amp; _tab_url &amp; "\"}"
+  return "{" &amp; _item_title &amp; _item_subtitle &amp; _item_arg &amp; _item_match &amp; _item_mods &amp; _item_text &amp; "}"
+end
+
+set _output to ""
+set _result_count to 0
+set _MAX_RESULTS to 100
+
+tell application "Arc"
+  set _window_index to 1
+
+  repeat with _window in windows
+    set _space_index to 1
+
+    repeat with _space in spaces of _window
+      set _tab_index to 1
+      set _tab_count to count tabs of _space
+      set _space_title to my escape_string(get title of _space)
+
+      repeat with _tab in tabs of _space
+        set _tab_title to my escape_string(get title of _tab)
+        set _tab_url to get URL of _tab
+
+        set _arg to ("[" &amp; _window_index &amp; "," &amp; _space_index &amp; "," &amp; _tab_index &amp; "]")
+        set _item to my build_item(_space_title, _tab_title, _tab_url, _arg)
+        set _output to (_output &amp; _item)
+        set _result_count to _result_count + 1
+
+        if _result_count &gt;= _MAX_RESULTS then
+          exit repeat
+        end if
+
+        if _tab_index &lt;= _tab_count then
+          set _output to (_output &amp; ",")
+        end if
+
+        set _tab_index to _tab_index + 1
+      end repeat
+
+      if _result_count &gt;= _MAX_RESULTS then
+        exit repeat
+      end if
+
+      set _space_index to _space_index + 1
+    end repeat
+
+    if _result_count &gt;= _MAX_RESULTS then
+      exit repeat
+    end if
+
+    set _window_index to _window_index + 1
+  end repeat
+end tell
+
+return "{\"items\":[" &amp; _output &amp; "]}"
+</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string>fetch_tabs.applescript</string>
+				<key>subtext</key>
+				<string>Filter Arc tabs</string>
+				<key>title</key>
+				<string>Arc tabs</string>
+				<key>type</key>
+				<integer>8</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>B7D01C90-FCC3-4D23-A2E3-342837DE2C3A</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>script</key>
+				<string>on run argv
+  set _window_id to item 1 of argv as number
+  set _space_id to item 2 of argv as number
+  set _tab_id to item 3 of argv as number
+
+  activate application "Arc"
+
+  tell application "Arc"
+    tell window _window_id
+      tell space _space_id
+        tell tab _tab_id to select
+      end tell
+    end tell
+  end tell
+end run</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string>open_tab.applescript</string>
+				<key>type</key>
+				<integer>8</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>3685A677-8073-4A84-BE71-AEBD76F8325E</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>hotkey</key>
+				<integer>17</integer>
+				<key>hotmod</key>
+				<integer>524288</integer>
+				<key>hotstring</key>
+				<string>T</string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>F651F0B7-25C4-4A3C-8CE4-B1D2B820C904</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string>An Alfred Workflow for controlling Arc browser.</string>
+	<key>uidata</key>
+	<dict>
+		<key>3685A677-8073-4A84-BE71-AEBD76F8325E</key>
+		<dict>
+			<key>xpos</key>
+			<real>665</real>
+			<key>ypos</key>
+			<real>140</real>
+		</dict>
+		<key>B7D01C90-FCC3-4D23-A2E3-342837DE2C3A</key>
+		<dict>
+			<key>xpos</key>
+			<real>300</real>
+			<key>ypos</key>
+			<real>140</real>
+		</dict>
+		<key>F651F0B7-25C4-4A3C-8CE4-B1D2B820C904</key>
+		<dict>
+			<key>xpos</key>
+			<real>35</real>
+			<key>ypos</key>
+			<real>140</real>
+		</dict>
+	</dict>
+	<key>userconfigurationconfig</key>
+	<array/>
+	<key>version</key>
+	<string>0.0.1</string>
+	<key>webaddress</key>
+	<string>https://github.com/hellovietduc</string>
+</dict>
+</plist>
