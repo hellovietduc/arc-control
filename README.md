@@ -8,9 +8,10 @@ Download the latest workflow from the [releases](https://github.com/hellovietduc
 
 ## Usage
 
-| Functionality    | Keyword | Shortcut                         |
-| ---------------- | ------- | -------------------------------- |
-| Search open tabs | `t`     | <kbd>Option</kbd> + <kbd>T</kbd> |
+| Functionality    | Keyword | Shortcut                          |
+| ---------------- | ------- | --------------------------------- |
+| Search open tabs | `t`     | <kbd>Option</kbd> + <kbd>T</kbd>  |
+| Copy tab URL     |         | <kbd>Command</kbd> + <kbd>C</kbd> |
 
 
 ## License
